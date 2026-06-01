@@ -1,0 +1,15 @@
+{
+  "keys": [
+    {
+      "kid": "kidKey",
+      "kty": "RSA",
+      "alg": "RS256",
+      "use": "sig",
+      "n": "nTest",
+      "e": "eTest",
+      "x5c": ["x5cTest"],
+      "x5t": "x5tTest",
+      "x5t#S256": "x5t#S256Test"
+    }
+  ]
+}

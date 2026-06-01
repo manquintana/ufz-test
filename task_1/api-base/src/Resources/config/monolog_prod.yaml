@@ -1,0 +1,18 @@
+monolog:
+    handlers:
+        app:
+            type: stream
+            path: php://stderr
+            level: info
+            formatter: monolog.formatter.json
+            channels: ["app"]
+        main:
+            type: stream
+            path: php://stderr
+            level: info
+            formatter: monolog.formatter.json
+            channels: ["!app"]
+        console:
+            type: console
+            process_psr_3_messages: false
+            channels: ["!event", "!doctrine"]

@@ -1,0 +1,71 @@
+parameters:
+  api_base.graphql.optimized_relations: []
+
+services:
+  Ufz\ApiBase\GraphQl\Resolver\Factory\CollectionResolverFactory:
+    decorates: 'api_platform.graphql.resolver.factory.collection'
+    decoration_on_invalid: ignore
+    arguments:
+      - '@api_platform.graphql.resolver.stage.read'
+      - '@api_platform.graphql.resolver.stage.security'
+      - '@api_platform.graphql.resolver.stage.security_post_denormalize'
+      - '@api_platform.graphql.resolver.stage.serialize'
+      - '@api_platform.graphql.query_resolver_locator'
+      - '@request_stack'
+      - '@doctrine'
+      - '%api_base.graphql.optimized_relations%'
+
+  Ufz\ApiBase\State\Provider\NoOpProvider:
+    tags: ['api_platform.state_provider']
+
+  Ufz\ApiBase\State\Provider\FilterApplyProvider:
+    tags: ['api_platform.state_provider']
+
+  Ufz\ApiBase\Aws\Signature\CustomSignatureProvider:
+    arguments:
+      $enabled: '%api_base.aws_s3.disable_content_sha256_in_presign%'
+
+  Ufz\ApiBase\EventListener\RequestLoggingSubscriber:
+    arguments:
+      $logger: '@?logger'
+    tags:
+      - { name: kernel.event_subscriber }
+
+  Ufz\ApiBase\Telemetry\TracerFactory:
+    arguments:
+      $logger: '@?logger'
+
+  Ufz\ApiBase\Telemetry\TracerBootstrap:
+    arguments:
+      $tracerFactory: '@Ufz\ApiBase\Telemetry\TracerFactory'
+    tags:
+      - { name: kernel.event_subscriber }
+
+  Ufz\ApiBase\Telemetry\Doctrine\DbalTracingMiddleware:
+    arguments:
+      $tracerFactory: '@Ufz\ApiBase\Telemetry\TracerFactory'
+      $logger: '@?logger'
+    tags:
+      - { name: doctrine.middleware, priority: 50 }
+
+  Ufz\ApiBase\Telemetry\Http\TracingHttpClient:
+    decorates: 'http_client'
+    arguments:
+      $client: '@Ufz\ApiBase\Telemetry\Http\TracingHttpClient.inner'
+      $tracerFactory: '@Ufz\ApiBase\Telemetry\TracerFactory'
+      $logger: '@?logger'
+
+  Ufz\ApiBase\EventListener\TracingSubscriber:
+    arguments:
+      $tracerFactory: '@Ufz\ApiBase\Telemetry\TracerFactory'
+      $logger: '@?logger'
+    tags:
+      - { name: kernel.event_subscriber }
+
+  Ufz\ApiBase\Serializer\CircularReferenceHandler: ~
+
+  Ufz\ApiBase\EventListener\HealthCheckListener:
+    arguments:
+      $connection: '@doctrine.dbal.default_connection'
+    tags:
+      - { name: kernel.event_subscriber }
