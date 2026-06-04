@@ -286,7 +286,7 @@ class GeoApiService implements GeoApiInterface
         if (count($gpsTrackingPoints) < 2) {
             throw new \InvalidArgumentException("At least 2 GPS tracking points are required");
         }
-    
+
         //case 2: user input is two times the same point
         //This case should be extended to: user input has all the points repeated, then it is a single Point (I will not implement it, but should be done)
         if (count($gpsTrackingPoints) == 2) {
@@ -305,7 +305,7 @@ class GeoApiService implements GeoApiInterface
             if (abs($point["lat"]) > 90 || abs($point["lng"]) > 180) {
                 throw new \InvalidArgumentException("Provided tracking point is out of range");
             }
-        }    
+        }
 
         // Build MULTILINESTRING geometry from GPS points
         $lineStringPoints = [];

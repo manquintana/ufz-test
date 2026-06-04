@@ -327,9 +327,5 @@ class GeoApiServiceTest extends TestCase
         ["lat" => 51.307168, "lng" => 12.2478963],
       ], "");
     }
-    
-
-
-
 
 }
